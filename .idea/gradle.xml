@@ -8,9 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/activity" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/utils" />
+            <option value="$PROJECT_DIR$/activityLib" />
+            <option value="$PROJECT_DIR$/quizgeoApp" />
+            <option value="$PROJECT_DIR$/utilsLib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

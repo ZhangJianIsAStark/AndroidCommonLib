@@ -3,9 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AndroidCommonLib.iml" filepath="$PROJECT_DIR$/AndroidCommonLib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/activity/activity.iml" filepath="$PROJECT_DIR$/activity/activity.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/utils/utils.iml" filepath="$PROJECT_DIR$/utils/utils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/activityLib/activityLib.iml" filepath="$PROJECT_DIR$/activityLib/activityLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/quizgeoApp/quizgeoApp.iml" filepath="$PROJECT_DIR$/quizgeoApp/quizgeoApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/utilsLib/utilsLib.iml" filepath="$PROJECT_DIR$/utilsLib/utilsLib.iml" />
     </modules>
   </component>
 </project>

@@ -1,1 +1,1 @@
-include ':app', ':activity', ':utils'
+include ':activityLib', ':utilsLib', ':quizgeoApp'
