@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_quiz"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
     tools:context="stark.a.is.zhang.quizgeo.QuizActivity">
 
     <TextView
         android:id="@+id/question_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:padding="@dimen/text_view_padding" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="horizontal">
 
         <Button
@@ -37,28 +37,25 @@
         android:id="@+id/cheat_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
         android:text="@string/cheat_button"/>
 
-    <LinearLayout
+    <ImageButton
+        android:id="@+id/prev_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:src="@drawable/arrow_left"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:contentDescription="@string/prev_button"/>
 
-        <ImageButton
-            android:id="@+id/prev_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/arrow_left"
-            android:contentDescription="@string/prev_button"/>
+    <ImageButton
+        android:id="@+id/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_right"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_gravity="bottom|end"
+        android:contentDescription="@string/next_button"/>
 
-        <ImageButton
-            android:id="@+id/next_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/arrow_right"
-            android:contentDescription="@string/next_button"/>
-
-    </LinearLayout>
-
-
-</LinearLayout>
+</FrameLayout>

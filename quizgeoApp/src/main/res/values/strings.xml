@@ -3,30 +3,37 @@
 
     <!--Questions begin -->
     <string name="question_oceans">
-        The Pacific Ocean is larger than the Atlantic Ocean.
+        1. The Pacific Ocean is larger than the Atlantic Ocean.
     </string>
 
     <string name="question_mideast">
-        The Suez Canal connects the Red Sea and the India Ocean.
+        2. The Suez Canal connects the Red Sea and the India Ocean.
     </string>
 
     <string name="question_africa">
-        The source of the Nile River is in Egypt.
+        3. The source of the Nile River is in Egypt.
     </string>
 
     <string name="question_americas">
-        The Amazon River is the longest river in the Americas.
+        4. The Amazon River is the longest river in the Americas.
     </string>
 
     <string name="question_asia">
-        Lake Baikal is the World\'s oldest and deepest freshwater lake.
+        5. Lake Baikal is the World\'s oldest and deepest freshwater lake.
     </string>
     <!--Questions end -->
 
+    <!--Button Text begin-->
     <string name="true_button">TRUE</string>
     <string name="false_button">FALSE</string>
+    <string name="prev_button">PREV</string>
     <string name="next_button">NEXT</string>
+    <string name="show_answer_button">SHOW_ANSWER</string>
+    <string name="cheat_button">CHEAT!</string>
+    <!--Button Text end-->
 
     <string name="correct_toast">Correct!</string>
     <string name="incorrect_toast">Incorrect!</string>
+    <string name="warning_text">Are you sure you want to do this?</string>
+    <string name="judgement_toast">Cheating is wrong.</string>
 </resources>

@@ -1,5 +1,10 @@
 package stark.a.is.zhang.quizgeo;
 
+/**
+ * A class to describe questions
+ * TextResId refer to the res id of question-stem
+ * AnswerIsTrue refer to the answer
+ * */
 class Question {
     private int mTextResId;
     private boolean mAnswerTrue;
