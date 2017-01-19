@@ -1,9 +1,13 @@
 package stark.a.is.zhang.quizgeo;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -19,10 +23,12 @@ public class CheatActivity extends BaseActivity {
     private boolean mAnswerIsTrue;
 
     private TextView mAnswerTextView;
-    private Button mButton;
+    private Button mShowAnswer;
 
     private static final String KEY_ANSWER_SHOWN = "answerShown";
     private boolean mWasAnswerShown;
+
+    private TextView mSdkVersionTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +59,27 @@ public class CheatActivity extends BaseActivity {
             updateAnswerTextView();
         }
 
-        mButton = (Button) findViewById(R.id.showAnswerButton);
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateAnswerTextView();
+        mShowAnswer = (Button) findViewById(R.id.showAnswerButton);
+        if (mWasAnswerShown) {
+            mShowAnswer.setVisibility(View.INVISIBLE);
+        } else {
+            mShowAnswer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    updateAnswerTextView();
 
-                mWasAnswerShown = true;
+                    mWasAnswerShown = true;
 
-                setAnswerShownResult(true);
-            }
-        });
+                    setAnswerShownResult(true);
+
+                    startAnimation();
+                }
+            });
+        }
+
+        mSdkVersionTextView = (TextView) findViewById(R.id.sdk_version_text_view);
+        String api = "API level: " + Build.VERSION.SDK_INT;
+        mSdkVersionTextView.setText(api);
     }
 
     @Override
@@ -103,5 +119,25 @@ public class CheatActivity extends BaseActivity {
     private void updateAnswerTextView() {
         int resId = mAnswerIsTrue ? R.string.true_button : R.string.false_button;
         mAnswerTextView.setText(resId);
+    }
+
+    private void startAnimation() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int cx = mShowAnswer.getWidth() / 2;
+            int cy = mShowAnswer.getHeight() / 2;
+            float radius = mShowAnswer.getWidth() / 2;
+
+            Animator anim = ViewAnimationUtils.createCircularReveal(mShowAnswer, cx, cy, radius, 0);
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    mShowAnswer.setVisibility(View.INVISIBLE);
+                }
+            });
+            anim.start();
+        } else {
+            mShowAnswer.setVisibility(View.INVISIBLE);
+        }
     }
 }
