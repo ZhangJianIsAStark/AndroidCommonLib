@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">CriminalIntentApp</string>
+
+    <!--CrimeFragment use begin-->
+    <string name="crime_title_label">Title</string>
+    <string name="crime_title_hint">Enter a title for the crime.</string>
+    <string name="crime_details_label">Details</string>
+    <string name="crime_solved_label">Solved</string>
+    <!--end-->
+
+    <string name="crime_item_button_text">TOP</string>
+</resources>

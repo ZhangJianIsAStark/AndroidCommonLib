@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/activityLib" />
+            <option value="$PROJECT_DIR$/criminalintentapp" />
             <option value="$PROJECT_DIR$/quizgeoApp" />
             <option value="$PROJECT_DIR$/utilsLib" />
           </set>
