@@ -1,4 +1,4 @@
-package stark.a.is.zhang.criminalintentapp;
+package stark.a.is.zhang.criminalintentapp.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +16,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import stark.a.is.zhang.criminalintentapp.activity.CrimePagerActivity;
+import stark.a.is.zhang.criminalintentapp.R;
+import stark.a.is.zhang.criminalintentapp.data.Crime;
+import stark.a.is.zhang.criminalintentapp.data.CrimeLab;
+
 public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
 
     private static final int REQUEST_CRIME = 1;
-    private HashMap<UUID, Integer> mCrimeIdPostion;
+    private HashMap<UUID, Integer> mCrimeIdPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,7 +36,7 @@ public class CrimeListFragment extends Fragment {
         mCrimeRecyclerView = (RecyclerView) v.findViewById(R.id.crime_recycler_view);
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mCrimeIdPostion = new HashMap<>();
+        mCrimeIdPosition = new HashMap<>();
 
         updateUI();
 
@@ -63,8 +67,8 @@ public class CrimeListFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = CrimeActivity.newStartIntent(getActivity(), mCrime.getId());
-                    mCrimeIdPostion.put(mCrime.getId(), mPosition);
+                    Intent intent = CrimePagerActivity.newStartIntent(getActivity(), mCrime.getId());
+                    mCrimeIdPosition.put(mCrime.getId(), mPosition);
 
                     startActivityForResult(intent, REQUEST_CRIME);
                 }
@@ -120,10 +124,10 @@ public class CrimeListFragment extends Fragment {
         }
 
         if (REQUEST_CRIME == requestCode) {
-            UUID crimeId = CrimeActivity.getCrimeIdFromIntent(data);
-            if (mCrimeIdPostion.containsKey(crimeId)) {
-                mAdapter.notifyItemChanged(mCrimeIdPostion.get(crimeId));
-                mCrimeIdPostion.remove(crimeId);
+            UUID crimeId = CrimePagerActivity.getCrimeIdFromIntent(data);
+            if (mCrimeIdPosition.containsKey(crimeId)) {
+                mAdapter.notifyItemChanged(mCrimeIdPosition.get(crimeId));
+                mCrimeIdPosition.remove(crimeId);
             }
         }
     }

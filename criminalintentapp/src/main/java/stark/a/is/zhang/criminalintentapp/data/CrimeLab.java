@@ -1,4 +1,4 @@
-package stark.a.is.zhang.criminalintentapp;
+package stark.a.is.zhang.criminalintentapp.data;
 
 import android.content.Context;
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialog_time_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/time_picker_title"
+        style="?android:listSeparatorTextViewStyle"/>
+
+    <TimePicker
+        android:id="@+id/dialog_time_time_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:calendarViewShown="false">
+    </TimePicker>
+
+    <Button
+        android:id="@+id/dialog_time_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/time_picker_positive"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:padding="@dimen/list_item_crime_padding"/>
+</LinearLayout>
+

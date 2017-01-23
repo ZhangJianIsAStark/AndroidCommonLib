@@ -1,4 +1,4 @@
-package stark.a.is.zhang.criminalintentapp;
+package stark.a.is.zhang.criminalintentapp.data;
 
 import android.text.format.DateFormat;
 
@@ -34,6 +34,14 @@ public class Crime {
 
     public String getDateString() {
         return DateFormat.format("yyyy-MM-dd, EE", mDate).toString();
+    }
+
+    public String getTimeString() {
+        return DateFormat.format("HH:mm", mDate).toString();
+    }
+
+    public Date getDate() {
+        return mDate;
     }
 
     public void setDate(Date date) {
