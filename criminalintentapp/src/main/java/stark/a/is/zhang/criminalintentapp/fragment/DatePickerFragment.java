@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
@@ -24,7 +25,16 @@ public class DatePickerFragment extends AppCompatDialogFragment{
     private static final String EXTRA_DATE =
             "stark.a.is.zhang.criminalintentapp.date";
 
-    @Override
+    public static DatePickerFragment newInstance(Date date) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_DATE, date);
+
+        DatePickerFragment fragment = new DatePickerFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Date date = (Date) getArguments().getSerializable(ARG_DATE);
 
@@ -53,15 +63,6 @@ public class DatePickerFragment extends AppCompatDialogFragment{
                             }
                         })
                 .create();
-    }
-
-    public static DatePickerFragment newInstance(Date date) {
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_DATE, date);
-
-        DatePickerFragment fragment = new DatePickerFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     private void sendResult(int resultCode, Date date) {

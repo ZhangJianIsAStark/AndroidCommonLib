@@ -23,7 +23,6 @@ public class CrimePagerActivity extends BaseActivity {
     private static final String EXTRA_CRIME_ID =
             "stark.a.is.zhang.criminalintentapp.crime_id";
 
-    private ViewPager mViewPager;
     private List<Crime> mCrimes;
 
     @Override
@@ -34,11 +33,11 @@ public class CrimePagerActivity extends BaseActivity {
     protected void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_crime_pager);
 
-        mViewPager = (ViewPager) findViewById(R.id.activity_crime_pager_view_pager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.activity_crime_pager_view_pager);
 
         mCrimes = CrimeLab.get(this.getApplicationContext()).getCrimes();
         FragmentManager fm = getSupportFragmentManager();
-        mViewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
+        viewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
             @Override
             public Fragment getItem(int position) {
                 Crime crime = mCrimes.get(position);
@@ -54,7 +53,7 @@ public class CrimePagerActivity extends BaseActivity {
         UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
         for (int i = 0; i < mCrimes.size(); ++i) {
             if (mCrimes.get(i).getId().equals(crimeId)) {
-                mViewPager.setCurrentItem(i);
+                viewPager.setCurrentItem(i);
                 break;
             }
         }

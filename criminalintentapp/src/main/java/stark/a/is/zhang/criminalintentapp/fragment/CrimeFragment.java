@@ -8,7 +8,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -34,10 +38,8 @@ public class CrimeFragment extends Fragment{
     private static final int REQUEST_TIME = 1;
 
     private Crime mCrime;
-    private EditText mTitleField;
     private Button mDateButton;
     private Button mTimeButton;
-    private CheckBox mSolvedCheckBox;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -51,6 +53,7 @@ public class CrimeFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity().getApplicationContext()).getCrime(crimeId);
@@ -61,9 +64,9 @@ public class CrimeFragment extends Fragment{
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
-        mTitleField = (EditText)v.findViewById(R.id.crime_title);
-        mTitleField.setText(mCrime.getTitle());
-        mTitleField.addTextChangedListener(new TextWatcher() {
+        EditText titleField = (EditText)v.findViewById(R.id.crime_title);
+        titleField.setText(mCrime.getTitle());
+        titleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -107,7 +110,7 @@ public class CrimeFragment extends Fragment{
             mTimeButton.setEnabled(false);
         }
 
-        mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
+        CheckBox mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -121,7 +124,16 @@ public class CrimeFragment extends Fragment{
     }
 
     private void returnResult() {
-        getActivity().setResult(Activity.RESULT_OK, CrimePagerActivity.newReturnIntent(mCrime.getId()));
+        if (mCrime != null) {
+            CrimeLab.get(getActivity().getApplicationContext())
+                    .updateCrime(mCrime);
+
+            getActivity().setResult(Activity.RESULT_OK,
+                    CrimePagerActivity.newReturnIntent(mCrime.getId()));
+        } else {
+            getActivity().setResult(Activity.RESULT_OK,
+                    CrimePagerActivity.newReturnIntent(null));
+        }
     }
 
     @Override
@@ -141,5 +153,25 @@ public class CrimeFragment extends Fragment{
         }
 
         returnResult();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_crime, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_item:
+                CrimeLab.get(getActivity().getApplicationContext()).removeCrime(mCrime);
+                mCrime = null;
+                returnResult();
+                getActivity().finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

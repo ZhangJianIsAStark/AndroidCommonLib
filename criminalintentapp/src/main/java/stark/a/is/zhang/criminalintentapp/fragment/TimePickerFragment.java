@@ -1,13 +1,9 @@
 package stark.a.is.zhang.criminalintentapp.fragment;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +24,15 @@ public class TimePickerFragment extends AppCompatDialogFragment {
             "stark.a.is.zhang.criminalintentapp.time";
 
     private TimePicker mTimePicker;
+
+    public static TimePickerFragment newInstance(Date date) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_TIME, date);
+
+        TimePickerFragment fragment = new TimePickerFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,15 +75,6 @@ public class TimePickerFragment extends AppCompatDialogFragment {
         }
 
         return v;
-    }
-
-    public static TimePickerFragment newInstance(Date date) {
-        Bundle args = new Bundle();
-        args.putSerializable(ARG_TIME, date);
-
-        TimePickerFragment fragment = new TimePickerFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     private void sendResult(int resultCode, Date date) {
