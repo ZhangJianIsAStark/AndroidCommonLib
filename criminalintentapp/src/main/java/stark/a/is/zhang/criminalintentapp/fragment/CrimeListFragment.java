@@ -67,6 +67,12 @@ public class CrimeListFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity().getApplicationContext());
         List<Crime> crimes = crimeLab.getCrimes();
