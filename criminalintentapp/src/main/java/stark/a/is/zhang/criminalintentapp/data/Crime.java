@@ -77,4 +77,8 @@ public class Crime {
     public void setContactId(String contactId) {
         mContactId = contactId;
     }
+
+    public String getPhotoFilename() {
+        return "IMG_" + getId().toString() + ".jpg";
+    }
 }

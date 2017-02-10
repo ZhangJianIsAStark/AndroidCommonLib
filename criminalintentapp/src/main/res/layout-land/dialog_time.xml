@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="vertical">
+              android:orientation="horizontal">
 
     <TimePicker
             android:id="@+id/dialog_time_time_picker"
@@ -10,4 +10,13 @@
             android:layout_height="wrap_content"
             android:calendarViewShown="true">
     </TimePicker>
+
+    <Button
+        android:id="@+id/dialog_time_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/time_picker_positive"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:padding="@dimen/list_item_crime_padding"/>
 </LinearLayout>

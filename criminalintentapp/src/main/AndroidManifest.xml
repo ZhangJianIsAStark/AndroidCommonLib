@@ -3,6 +3,8 @@
           package="stark.a.is.zhang.criminalintentapp">
 
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-feature android:name="android.hardware.camera2"
+                  android:required="false"/>
 
     <application
         android:allowBackup="true"

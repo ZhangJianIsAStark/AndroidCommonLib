@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TimePicker;
 
@@ -31,7 +35,15 @@ public class TimePickerFragment extends AppCompatDialogFragment {
 
         TimePickerFragment fragment = new TimePickerFragment();
         fragment.setArguments(args);
+
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        int style = DialogFragment.STYLE_NO_TITLE, theme = 0;
+        setStyle(style,theme);
     }
 
     @Override
@@ -46,7 +58,8 @@ public class TimePickerFragment extends AppCompatDialogFragment {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_time, null);
+        View v = inflater.inflate(R.layout.dialog_time, null);
+
         mTimePicker = (TimePicker) v.findViewById(R.id.dialog_time_time_picker);
         mTimePicker.setIs24HourView(true);
         if (Build.VERSION.SDK_INT >= 23) {
