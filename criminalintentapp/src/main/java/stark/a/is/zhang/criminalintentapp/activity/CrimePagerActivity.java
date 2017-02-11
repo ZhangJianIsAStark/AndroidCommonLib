@@ -17,7 +17,8 @@ import stark.a.is.zhang.criminalintentapp.data.Crime;
 import stark.a.is.zhang.criminalintentapp.data.CrimeLab;
 import stark.a.is.zhang.criminalintentapp.fragment.CrimeFragment;
 
-public class CrimePagerActivity extends BaseActivity {
+public class CrimePagerActivity extends BaseActivity
+        implements CrimeFragment.Callbacks {
     private static final String EXTRA_CRIME_ID =
             "stark.a.is.zhang.criminalintentapp.crime_id";
 
@@ -67,13 +68,7 @@ public class CrimePagerActivity extends BaseActivity {
         return intent;
     }
 
-    public static Intent newReturnIntent(UUID crimeId) {
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_CRIME_ID, crimeId);
-        return intent;
-    }
-
-    public static UUID getCrimeIdFromIntent(Intent intent) {
-        return (UUID)intent.getSerializableExtra(EXTRA_CRIME_ID);
+    @Override
+    public void onCrimeUpdated() {
     }
 }

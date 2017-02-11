@@ -2,6 +2,7 @@ package stark.a.is.zhang.criminalintentapp.fragment;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -38,7 +39,6 @@ import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
-import stark.a.is.zhang.criminalintentapp.activity.CrimePagerActivity;
 import stark.a.is.zhang.criminalintentapp.R;
 import stark.a.is.zhang.criminalintentapp.data.Crime;
 import stark.a.is.zhang.criminalintentapp.data.CrimeLab;
@@ -69,6 +69,8 @@ public class CrimeFragment extends Fragment{
 
     private static final int ASK_READ_CONTACTS_PERMISSION = 0;
 
+    private Callbacks mCallbacks;
+
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, crimeId);
@@ -76,6 +78,18 @@ public class CrimeFragment extends Fragment{
         CrimeFragment crimeFragment = new CrimeFragment();
         crimeFragment.setArguments(args);
         return crimeFragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks)context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
     }
 
     @Override
@@ -104,7 +118,7 @@ public class CrimeFragment extends Fragment{
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 mCrime.setTitle(charSequence.toString());
-                returnResult();
+                updateCrime();
             }
 
             @Override
@@ -146,7 +160,7 @@ public class CrimeFragment extends Fragment{
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 mCrime.setSolved(b);
-                returnResult();
+                updateCrime();
             }
         });
 
@@ -253,19 +267,6 @@ public class CrimeFragment extends Fragment{
         return v;
     }
 
-    private void returnResult() {
-        if (mCrime != null) {
-            CrimeLab.get(getActivity().getApplicationContext())
-                    .updateCrime(mCrime);
-
-            getActivity().setResult(Activity.RESULT_OK,
-                    CrimePagerActivity.newReturnIntent(mCrime.getId()));
-        } else {
-            getActivity().setResult(Activity.RESULT_OK,
-                    CrimePagerActivity.newReturnIntent(null));
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) {
@@ -315,7 +316,7 @@ public class CrimeFragment extends Fragment{
             updatePhotoView();
         }
 
-        returnResult();
+        updateCrime();
     }
 
     @Override
@@ -329,8 +330,7 @@ public class CrimeFragment extends Fragment{
         switch (item.getItemId()) {
             case R.id.menu_item_delete_item:
                 CrimeLab.get(getActivity().getApplicationContext()).removeCrime(mCrime);
-                mCrime = null;
-                returnResult();
+                mCallbacks.onCrimeUpdated();
                 getActivity().finish();
                 return true;
             default:
@@ -424,5 +424,14 @@ public class CrimeFragment extends Fragment{
             Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
+    }
+
+    public interface Callbacks {
+        void onCrimeUpdated( );
+    }
+
+    private void updateCrime() {
+        CrimeLab.get(getActivity().getApplicationContext()).updateCrime(mCrime);
+        mCallbacks.onCrimeUpdated();
     }
 }
