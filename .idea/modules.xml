@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AndroidCommonLib.iml" filepath="$PROJECT_DIR$/AndroidCommonLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/activityLib/activityLib.iml" filepath="$PROJECT_DIR$/activityLib/activityLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/beatbox/beatbox.iml" filepath="$PROJECT_DIR$/beatbox/beatbox.iml" />
       <module fileurl="file://$PROJECT_DIR$/criminalintentapp/criminalintentapp.iml" filepath="$PROJECT_DIR$/criminalintentapp/criminalintentapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/quizgeoApp/quizgeoApp.iml" filepath="$PROJECT_DIR$/quizgeoApp/quizgeoApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/utilsLib/utilsLib.iml" filepath="$PROJECT_DIR$/utilsLib/utilsLib.iml" />

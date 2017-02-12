@@ -103,7 +103,6 @@ public class CrimeListFragment extends Fragment {
 
     private class CrimeHolder extends RecyclerView.ViewHolder {
         private Crime mCrime;
-        private int mPosition;
 
         private TextView mTitleTextView;
         private TextView mDateTextView;
@@ -136,9 +135,8 @@ public class CrimeListFragment extends Fragment {
             });
         }
 
-        void bindCrime(Crime crime, int position) {
+        void bindCrime(Crime crime) {
             mCrime = crime;
-            mPosition = position;
 
             mTitleTextView.setText(crime.getTitle());
             mDateTextView.setText(crime.getDateString());
@@ -162,7 +160,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(CrimeHolder holder, int position) {
-            holder.bindCrime(mCrimes.get(position), position);
+            holder.bindCrime(mCrimes.get(position));
         }
 
         @Override
