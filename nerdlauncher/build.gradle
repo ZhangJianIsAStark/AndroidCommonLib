@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-        applicationId "stark.a.is.zhang.beatbox"
+        applicationId "stark.a.is.zhang.nerdlauncher"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
@@ -20,14 +20,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    splits {
-        density {
-            enable true
-            exclude "ldpi", "tvdpi", "xxxhdpi"
-            compatibleScreens 'small', 'normal', 'large', 'xlarge'
-        }
-    }
 }
 
 dependencies {
@@ -37,6 +29,6 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.1.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:recyclerview-v7:25.1.0'
     compile project(':activityLib')
+    compile 'com.android.support:recyclerview-v7:25.1.0'
 }
