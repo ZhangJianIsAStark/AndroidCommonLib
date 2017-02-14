@@ -1,8 +1,11 @@
 package stark.a.is.zhang.photogallery;
 
-import android.os.AsyncTask;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,15 +26,38 @@ public class PhotoGalleryFragment extends Fragment{
         return new PhotoGalleryFragment();
     }
 
-    private AsyncTask mAsyncTask;
+    public static final int mLoaderId = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        mAsyncTask = new FetchItemsTask();
-        mAsyncTask.execute();
+        LoaderManager.LoaderCallbacks<List<GalleryItem>> callback =
+                new LoaderManager.LoaderCallbacks<List<GalleryItem>>() {
+            @Override
+            public Loader<List<GalleryItem>> onCreateLoader(int id, Bundle args) {
+                if (id == mLoaderId) {
+                    return new FetchItemsLoader(getActivity());
+                } else {
+                    return null;
+                }
+            }
+
+            @Override
+            public void onLoadFinished(Loader<List<GalleryItem>> loader, List<GalleryItem> data) {
+                if (loader.getId() == mLoaderId) {
+                    mGalleryItems = data;
+                    setupAdapter();
+                }
+            }
+
+            @Override
+            public void onLoaderReset(Loader<List<GalleryItem>> loader) {
+            }
+        };
+
+        getLoaderManager().restartLoader(mLoaderId, null, callback);
     }
 
     @Override
@@ -46,19 +72,7 @@ public class PhotoGalleryFragment extends Fragment{
         return v;
     }
 
-    //AsyncTask研究、网络连接性判断
-    private class FetchItemsTask extends AsyncTask<Void, Void, List<GalleryItem>> {
-        @Override
-        protected List<GalleryItem> doInBackground(Void... params) {
-            return new ImageFetcher().fetchItems();
-        }
-
-        @Override
-        protected void onPostExecute(List<GalleryItem> items) {
-            mGalleryItems = items;
-            setupAdapter();
-        }
-    }
+    //网络连接性判断
 
     private class PhotoHolder extends RecyclerView.ViewHolder {
         private GalleryItem mGalleryItem;
@@ -107,6 +121,21 @@ public class PhotoGalleryFragment extends Fragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mAsyncTask.cancel(false);
+    }
+
+    private static class FetchItemsLoader extends AsyncTaskLoader<List<GalleryItem>> {
+        FetchItemsLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onStartLoading() {
+            forceLoad();
+        }
+
+        @Override
+        public List<GalleryItem> loadInBackground() {
+            return new ImageFetcher().fetchItems();
+        }
     }
 }
