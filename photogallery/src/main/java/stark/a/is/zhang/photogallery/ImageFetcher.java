@@ -1,17 +1,18 @@
 package stark.a.is.zhang.photogallery;
 
 import android.net.Uri;
-import android.util.Log;
 
-import org.json.JSONArray;
+import com.google.gson.Gson;
+
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import stark.a.is.zhang.photogallery.model.Data;
 import stark.a.is.zhang.photogallery.model.GalleryItem;
+import stark.a.is.zhang.photogallery.model.Response;
 import stark.a.is.zhang.utils.HttpUtil;
 
 public class ImageFetcher {
@@ -27,8 +28,10 @@ public class ImageFetcher {
 
             String jsonString = HttpUtil.getUrlString(url);
 
-            JSONObject jsonBody = new JSONObject(jsonString);
-            parseItems(items, jsonBody);
+            Gson gson = new Gson();
+
+            Response response = gson.fromJson(jsonString, Response.class);
+            parseItems(items, response);
         } catch (JSONException | IOException e) {
                 e.printStackTrace();
         }
@@ -36,14 +39,12 @@ public class ImageFetcher {
         return items;
     }
 
-    private void parseItems(List<GalleryItem> items, JSONObject jsonBody)
+    private void parseItems(List<GalleryItem> items, Response response)
             throws IOException, JSONException {
-        JSONArray dataArray = jsonBody.getJSONArray("data");
-        for (int i = 0; i < dataArray.length(); ++i) {
-            JSONObject dataObject = dataArray.getJSONObject(i);
-
+        List<Data> dataList = response.getData();
+        for (Data data : dataList) {
             GalleryItem item = new GalleryItem();
-            item.setUrl(dataObject.getString("objURL"));
+            item.setUrl(data.getObjURL());
 
             items.add(item);
         }
