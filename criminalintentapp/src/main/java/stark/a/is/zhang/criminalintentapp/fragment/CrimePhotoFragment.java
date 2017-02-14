@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import stark.a.is.zhang.criminalintentapp.R;
-import stark.a.is.zhang.utils.PictureUtils;
+import stark.a.is.zhang.utils.PictureUtil;
 
 public class CrimePhotoFragment extends AppCompatDialogFragment{
     private static String FILE_PATH = "filePath";
@@ -39,7 +39,7 @@ public class CrimePhotoFragment extends AppCompatDialogFragment{
 
         ImageView imageView = (ImageView) v.findViewById(R.id.crime_big_photo);
 
-        Bitmap bitmap = PictureUtils.getScaledBitmap(filePath, getActivity());
+        Bitmap bitmap = PictureUtil.getScaledBitmap(filePath, getActivity());
         imageView.setImageBitmap(bitmap);
 
         return v;

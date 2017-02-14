@@ -42,7 +42,7 @@ import java.util.UUID;
 import stark.a.is.zhang.criminalintentapp.R;
 import stark.a.is.zhang.criminalintentapp.data.Crime;
 import stark.a.is.zhang.criminalintentapp.data.CrimeLab;
-import stark.a.is.zhang.utils.PictureUtils;
+import stark.a.is.zhang.utils.PictureUtil;
 
 import static android.support.v4.content.ContextCompat.checkSelfPermission;
 
@@ -421,7 +421,7 @@ public class CrimeFragment extends Fragment{
         if (mPhotoFile == null || !mPhotoFile.exists()) {
             mPhotoView.setImageDrawable(null);
         } else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            Bitmap bitmap = PictureUtil.getScaledBitmap(mPhotoFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
     }
