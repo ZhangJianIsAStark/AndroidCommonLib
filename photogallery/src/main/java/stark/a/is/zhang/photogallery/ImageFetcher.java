@@ -1,6 +1,7 @@
 package stark.a.is.zhang.photogallery;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.gson.Gson;
 

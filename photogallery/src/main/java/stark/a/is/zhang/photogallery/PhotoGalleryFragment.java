@@ -8,9 +8,11 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -65,7 +67,24 @@ public class PhotoGalleryFragment extends Fragment{
         View v = inflater.inflate(R.layout.fragment_photo_gallery, container, false);
 
         mPhotoRecyclerView = (RecyclerView) v.findViewById(R.id.fragment_photo_gallery_recycler_view);
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+
+        ViewTreeObserver viewTreeObserver = mPhotoRecyclerView.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            private int last = 0;
+
+            @Override
+            public void onGlobalLayout() {
+                if (getView() != null) {
+                    int width = getView().getWidth();
+                    int count = width / 400;
+                    Log.d("ZJTest", " " + count);
+                    if (last != count) {
+                        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), count));
+                        last = count;
+                    }
+                }
+            }
+        });
 
         setupAdapter();
 
