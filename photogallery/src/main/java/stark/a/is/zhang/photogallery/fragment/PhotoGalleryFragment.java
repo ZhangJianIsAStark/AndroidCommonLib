@@ -4,15 +4,22 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,12 +50,32 @@ public class PhotoGalleryFragment extends Fragment{
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        //网络连接性判断
-
         mCallback = new LoaderCallback();
-        startURLLoader();
-
         createThumbnailDownLoader();
+
+        if (isConnectedToNetwork()) {
+            startURLLoader();
+        } else {
+            Toast.makeText(getActivity(), "Please Connect to Internet", Toast.LENGTH_SHORT).show();
+        }
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            registerNetworkCallBack();
+        }
+    }
+
+    private ConnectivityManager mConMgr;
+
+    private boolean isConnectedToNetwork() {
+        mConMgr = (ConnectivityManager) getActivity().getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo =  mConMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+
+        return false;
     }
 
     private static final int mLoaderId = 0;
@@ -83,7 +110,7 @@ public class PhotoGalleryFragment extends Fragment{
 
     private void startURLLoader() {
         Bundle args = new Bundle();
-        args.putInt(PAGE, mPage++);
+        args.putInt(PAGE, mPage);
         getLoaderManager().restartLoader(mLoaderId, args, mCallback);
     }
 
@@ -126,6 +153,24 @@ public class PhotoGalleryFragment extends Fragment{
         mThumbnailDownloader.start();
         //make sure that looper is prepared
         mThumbnailDownloader.getLooper();
+    }
+
+    private ConnectivityManager.NetworkCallback mNetworkCallback;
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void registerNetworkCallBack() {
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+
+        mNetworkCallback = new ConnectivityManager.NetworkCallback(){
+            @Override
+            public void onAvailable(Network network) {
+                startURLLoader();
+            }
+        };
+
+        mConMgr.registerNetworkCallback(networkRequest, mNetworkCallback);
     }
 
     private RecyclerView mPhotoRecyclerView;
@@ -204,6 +249,7 @@ public class PhotoGalleryFragment extends Fragment{
 
                     if ((lastVisibleItemPosition == totalItemCount - 1)
                             || (lastToPreloadPosition >= totalItemCount)){
+                        ++mPage;
                         startURLLoader();
                     } else if (firstVisibleItemPosition == 0) {
                         Toast.makeText(getActivity(),
@@ -317,5 +363,8 @@ public class PhotoGalleryFragment extends Fragment{
     public void onDestroy() {
         super.onDestroy();
         mThumbnailDownloader.quit();
+        if (mNetworkCallback != null && Build.VERSION.SDK_INT >= 21) {
+            mConMgr.unregisterNetworkCallback(mNetworkCallback);
+        }
     }
 }
