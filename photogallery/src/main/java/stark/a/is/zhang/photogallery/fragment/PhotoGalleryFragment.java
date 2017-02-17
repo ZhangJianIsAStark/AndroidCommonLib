@@ -13,17 +13,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +42,7 @@ import java.util.List;
 import stark.a.is.zhang.photogallery.R;
 import stark.a.is.zhang.photogallery.model.GalleryItem;
 import stark.a.is.zhang.photogallery.tool.ImageFetcher;
+import stark.a.is.zhang.photogallery.tool.QueryPreference;
 import stark.a.is.zhang.photogallery.tool.ThumbnailDownloader;
 
 public class PhotoGalleryFragment extends Fragment{
@@ -49,12 +56,13 @@ public class PhotoGalleryFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
 
         mCallback = new LoaderCallback();
         createThumbnailDownLoader();
 
         if (isConnectedToNetwork()) {
-            startURLLoader();
+            startURLLoader(buildLoaderArgs());
         } else {
             Toast.makeText(getActivity(), "Please Connect to Internet", Toast.LENGTH_SHORT).show();
         }
@@ -71,11 +79,8 @@ public class PhotoGalleryFragment extends Fragment{
                 Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo =  mConMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
 
-        return false;
+        return (networkInfo != null) && networkInfo.isConnected();
     }
 
     private static final int mLoaderId = 0;
@@ -84,12 +89,13 @@ public class PhotoGalleryFragment extends Fragment{
 
     private List<GalleryItem> mGalleryItems = new ArrayList<>();
 
+    Handler mMainHandler = new Handler();
+
     private class LoaderCallback implements LoaderManager.LoaderCallbacks<List<GalleryItem>> {
         @Override
         public Loader<List<GalleryItem>> onCreateLoader(int id, Bundle args) {
             if (id == mLoaderId) {
-                int page = args.getInt(PAGE, 0);
-                return new FetchItemsLoader(getActivity(), page);
+                return new FetchItemsLoader(getActivity(), args);
             } else {
                 return null;
             }
@@ -99,7 +105,15 @@ public class PhotoGalleryFragment extends Fragment{
         public void onLoadFinished(Loader<List<GalleryItem>> loader, List<GalleryItem> data) {
             if (loader.getId() == mLoaderId) {
                 mGalleryItems.addAll(data);
-                setupAdapter();
+
+                mMainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        setupAdapter();
+
+                        removeDialog();
+                    }
+                });
             }
         }
 
@@ -108,18 +122,24 @@ public class PhotoGalleryFragment extends Fragment{
         }
     }
 
-    private void startURLLoader() {
+    private Bundle buildLoaderArgs() {
         Bundle args = new Bundle();
         args.putInt(PAGE, mPage);
+
+        return args;
+    }
+
+    private void startURLLoader(Bundle args) {
         getLoaderManager().restartLoader(mLoaderId, args, mCallback);
     }
 
     private static class FetchItemsLoader extends AsyncTaskLoader<List<GalleryItem>> {
         private int mConvertPage;
 
-        FetchItemsLoader(Context context, int page) {
+        FetchItemsLoader(Context context, Bundle args) {
             super(context);
             //Just for baidu image search use, the gap between two pages is 20
+            int page = args.getInt(PAGE, 0);
             mConvertPage = page * 20;
         }
 
@@ -130,16 +150,20 @@ public class PhotoGalleryFragment extends Fragment{
 
         @Override
         public List<GalleryItem> loadInBackground() {
-            return new ImageFetcher().fetchItems(mConvertPage);
+            String word = QueryPreference.getStoredQuery(getContext());
+
+            if (word == null) {
+                return new ImageFetcher().fetchDefaultPhotos(mConvertPage);
+            } else {
+                return new ImageFetcher().searchPhotos(mConvertPage, word);
+            }
         }
     }
 
     private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
 
     private void createThumbnailDownLoader() {
-        Handler responseHandler = new Handler();
-
-        mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
+        mThumbnailDownloader = new ThumbnailDownloader<>(mMainHandler);
         mThumbnailDownloader.setThumbnailDownloadListener(
                 new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>() {
                     @Override
@@ -166,7 +190,7 @@ public class PhotoGalleryFragment extends Fragment{
         mNetworkCallback = new ConnectivityManager.NetworkCallback(){
             @Override
             public void onAvailable(Network network) {
-                startURLLoader();
+                startURLLoader(buildLoaderArgs());
             }
         };
 
@@ -250,7 +274,7 @@ public class PhotoGalleryFragment extends Fragment{
                     if ((lastVisibleItemPosition == totalItemCount - 1)
                             || (lastToPreloadPosition >= totalItemCount)){
                         ++mPage;
-                        startURLLoader();
+                        startURLLoader(buildLoaderArgs());
                     } else if (firstVisibleItemPosition == 0) {
                         Toast.makeText(getActivity(),
                                 "Already to the top",
@@ -281,9 +305,6 @@ public class PhotoGalleryFragment extends Fragment{
     private void setupAdapter() {
         if (isAdded()) {
             mPhotoRecyclerView.setAdapter(new PhotoAdapter(mGalleryItems));
-
-            //加个动画什么的比较好
-
             mPhotoRecyclerView.scrollToPosition(mLastPosition);
         }
     }
@@ -343,6 +364,7 @@ public class PhotoGalleryFragment extends Fragment{
             mTextView.setText(getString(R.string.text_title, "" + position));
         }
 
+// A Test used Picasso Library to download pictures
 //        void bindGalleryItem(GalleryItem galleryItem, int position) {
 //            mTextView.setText(getString(R.string.text_title, "" + position));
 //
@@ -351,6 +373,90 @@ public class PhotoGalleryFragment extends Fragment{
 //                    .placeholder(R.drawable.place_holder)
 //                    .into(mItemImageView);
 //        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        super.onCreateOptionsMenu(menu, menuInflater);
+        menuInflater.inflate(R.menu.fragment_photo_gallery, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //hide the input keyboard
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+
+                //change the searchView back to an icon
+                searchView.onActionViewCollapsed();
+
+                String oldQuery = QueryPreference.getStoredQuery(getActivity());
+                if (oldQuery != null && oldQuery.equals(query)) {
+                    return true;
+                }
+
+                QueryPreference.setStoredQuery(getActivity(), query);
+                reloadPictureAfterQueryChange();
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String query = QueryPreference.getStoredQuery(getContext());
+                searchView.setQuery(query, false);
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_clear:
+                QueryPreference.setStoredQuery(getActivity(), null);
+                reloadPictureAfterQueryChange();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private static String FRAGMENT_TAG = "progressDialog";
+
+    private void reloadPictureAfterQueryChange() {
+        mThumbnailDownloader.clearQueue();
+        mLastPosition = 0;
+        mGalleryItems.clear();
+
+        showDialog();
+
+        startURLLoader(buildLoaderArgs());
+    }
+
+    private void showDialog() {
+        DialogFragment fragment = new ProgressDialogFragment();
+        getFragmentManager().beginTransaction()
+                .add(fragment, FRAGMENT_TAG)
+                .commit();
+    }
+
+    private void removeDialog() {
+        DialogFragment fragment = (DialogFragment) getFragmentManager()
+                .findFragmentByTag(FRAGMENT_TAG);
+        if (fragment != null) {
+            fragment.dismiss();
+        }
     }
 
     @Override

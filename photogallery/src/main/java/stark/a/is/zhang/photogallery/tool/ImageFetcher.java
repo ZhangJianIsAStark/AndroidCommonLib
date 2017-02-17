@@ -16,17 +16,20 @@ import stark.a.is.zhang.photogallery.model.Response;
 import stark.a.is.zhang.utils.HttpUtil;
 
 public class ImageFetcher {
-    public List<GalleryItem> fetchItems(int page) {
+    public List<GalleryItem> fetchDefaultPhotos(int page) {
+        String url = buildUrl(page, null);
+        return downloadGalleryItems(url);
+    }
+
+    public List<GalleryItem> searchPhotos(int page, String query) {
+        String url = buildUrl(page, query);
+        return downloadGalleryItems(url);
+    }
+
+    private List<GalleryItem> downloadGalleryItems(String url) {
         List<GalleryItem> items = new ArrayList<>();
 
         try {
-            String url = Uri.parse("http://image.baidu.com/search/index?")
-                    .buildUpon()
-                    .appendQueryParameter("tn", "resultjson")
-                    .appendQueryParameter("word", "海贼王")
-                    .appendQueryParameter("pn", "" + page)
-                    .build().toString();
-
             String jsonString = HttpUtil.getUrlString(url);
 
             Gson gson = new Gson();
@@ -34,14 +37,32 @@ public class ImageFetcher {
 
             parseItems(items, response);
         } catch (JSONException | IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
 
         return items;
     }
 
+    private String buildUrl(int page, String word) {
+        Uri.Builder uriBuilder = Uri.parse("http://image.baidu.com/search/index?").buildUpon();
+        uriBuilder.appendQueryParameter("tn", "resultjson");
+        uriBuilder.appendQueryParameter("pn", "" + page);
+
+        if (word != null) {
+            uriBuilder.appendQueryParameter("word", word);
+        } else {
+            uriBuilder.appendQueryParameter("word", "极简");
+        }
+
+        return uriBuilder.build().toString();
+    }
+
     private void parseItems(List<GalleryItem> items, Response response)
             throws IOException, JSONException {
+        if (response == null) {
+            return;
+        }
+
         List<Data> dataList = response.getData();
 
         for (Data data : dataList) {
