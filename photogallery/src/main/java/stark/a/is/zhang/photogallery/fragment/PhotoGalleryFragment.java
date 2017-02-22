@@ -1,5 +1,9 @@
 package stark.a.is.zhang.photogallery.fragment;
 
+import android.annotation.TargetApi;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,10 +15,8 @@ import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -41,16 +43,20 @@ import java.util.List;
 
 import stark.a.is.zhang.photogallery.R;
 import stark.a.is.zhang.photogallery.model.GalleryItem;
+import stark.a.is.zhang.photogallery.service.JobPollService;
+import stark.a.is.zhang.photogallery.service.PollService;
 import stark.a.is.zhang.photogallery.tool.ImageFetcher;
 import stark.a.is.zhang.photogallery.tool.QueryPreference;
 import stark.a.is.zhang.photogallery.tool.ThumbnailDownloader;
 
-public class PhotoGalleryFragment extends Fragment{
+public class PhotoGalleryFragment extends VisibleFragment {
     public static PhotoGalleryFragment newInstance() {
         return new PhotoGalleryFragment();
     }
 
     LoaderManager.LoaderCallbacks<List<GalleryItem>> mCallback;
+
+    private String mLastQuery;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,8 @@ public class PhotoGalleryFragment extends Fragment{
         if (Build.VERSION.SDK_INT >= 21) {
             registerNetworkCallBack();
         }
+
+        mLastQuery = QueryPreference.getStoredQuery(getContext());
     }
 
     private ConnectivityManager mConMgr;
@@ -88,8 +96,6 @@ public class PhotoGalleryFragment extends Fragment{
     private int mPage = 0;
 
     private List<GalleryItem> mGalleryItems = new ArrayList<>();
-
-    Handler mMainHandler = new Handler();
 
     private class LoaderCallback implements LoaderManager.LoaderCallbacks<List<GalleryItem>> {
         @Override
@@ -214,6 +220,26 @@ public class PhotoGalleryFragment extends Fragment{
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        forceUpdate();
+    }
+
+    @Override
+    protected void forceUpdate() {
+        if (queryChangeByService()) {
+            mLastQuery = QueryPreference.getStoredQuery(getContext());
+
+            reloadPictureAfterQueryChange();
+        }
+    }
+
+    private boolean queryChangeByService() {
+        String query =  QueryPreference.getStoredQuery(getContext());
+        return query != null && !query.equals(mLastQuery);
+    }
+
     private void dynamicAdjustLayoutManager() {
         ViewTreeObserver viewTreeObserver = mPhotoRecyclerView.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -274,6 +300,12 @@ public class PhotoGalleryFragment extends Fragment{
                     if ((lastVisibleItemPosition == totalItemCount - 1)
                             || (lastToPreloadPosition >= totalItemCount)){
                         ++mPage;
+
+                        Toast.makeText(getActivity(),
+                                "Loading",
+                                Toast.LENGTH_SHORT)
+                                .show();
+
                         startURLLoader(buildLoaderArgs());
                     } else if (firstVisibleItemPosition == 0) {
                         Toast.makeText(getActivity(),
@@ -304,8 +336,17 @@ public class PhotoGalleryFragment extends Fragment{
 
     private void setupAdapter() {
         if (isAdded()) {
-            mPhotoRecyclerView.setAdapter(new PhotoAdapter(mGalleryItems));
+            if (mPhotoRecyclerView.getAdapter() == null) {
+                mPhotoRecyclerView.setAdapter(new PhotoAdapter(mGalleryItems));
+            } else {
+                mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
+            }
+
             mPhotoRecyclerView.scrollToPosition(mLastPosition);
+
+            if (mGalleryItems.size() == 0) {
+                Toast.makeText(getContext(), "Downloading now", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -393,6 +434,7 @@ public class PhotoGalleryFragment extends Fragment{
 
                 //change the searchView back to an icon
                 searchView.onActionViewCollapsed();
+                getActivity().invalidateOptionsMenu();
 
                 String oldQuery = QueryPreference.getStoredQuery(getActivity());
                 if (oldQuery != null && oldQuery.equals(query)) {
@@ -400,6 +442,8 @@ public class PhotoGalleryFragment extends Fragment{
                 }
 
                 QueryPreference.setStoredQuery(getActivity(), query);
+                mLastQuery = query;
+
                 reloadPictureAfterQueryChange();
 
                 return true;
@@ -418,6 +462,55 @@ public class PhotoGalleryFragment extends Fragment{
                 searchView.setQuery(query, false);
             }
         });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                getActivity().invalidateOptionsMenu();
+                return false;
+            }
+        });
+
+        MenuItem toggleItem = menu.findItem(R.id.menu_item_toggle_polling);
+        toggleItem.setTitle(getToggleItemResId());
+    }
+
+    private int getToggleItemResId() {
+        int rst;
+
+        if (Build.VERSION.SDK_INT >= 21) {
+             if (isJobPollServiceOn()) {
+                 rst = R.string.stop_polling;
+             } else {
+                 rst = R.string.start_polling;
+             }
+        } else {
+            if (PollService.isServiceAlarmOn(getContext())) {
+                rst = R.string.stop_polling;
+            } else {
+                rst = R.string.start_polling;
+            }
+        }
+
+        return rst;
+    }
+
+    final int JOB_ID = 1;
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private boolean isJobPollServiceOn() {
+        JobScheduler scheduler = (JobScheduler) getActivity()
+                .getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+        boolean hasBeenScheduled = false;
+        for (JobInfo jobInfo : scheduler.getAllPendingJobs()) {
+            if (jobInfo.getId() == JOB_ID) {
+                hasBeenScheduled = true;
+                break;
+            }
+        }
+
+        return hasBeenScheduled;
     }
 
     @Override
@@ -425,8 +518,35 @@ public class PhotoGalleryFragment extends Fragment{
         switch (item.getItemId()) {
             case R.id.menu_item_clear:
                 QueryPreference.setStoredQuery(getActivity(), null);
+                mLastQuery = null;
+
                 reloadPictureAfterQueryChange();
                 return true;
+
+            case R.id.menu_item_toggle_polling:
+                if (Build.VERSION.SDK_INT >= 21) {
+                    JobScheduler scheduler = (JobScheduler) getActivity()
+                            .getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+                    if (isJobPollServiceOn()) {
+                        scheduler.cancel(JOB_ID);
+                    } else {
+                        JobInfo jobInfo = new JobInfo.Builder(
+                                JOB_ID, new ComponentName(getContext(), JobPollService.class))
+                                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                                .setPeriodic(1000 * 10 * 15)
+                                .setPersisted(true)
+                                .build();
+                        scheduler.schedule(jobInfo);
+                    }
+                } else {
+                    boolean shouldStartAlarm = !PollService.isServiceAlarmOn(getContext());
+                    PollService.setServiceAlarm(getContext(), shouldStartAlarm);
+                }
+
+                getActivity().invalidateOptionsMenu();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -435,9 +555,15 @@ public class PhotoGalleryFragment extends Fragment{
     private static String FRAGMENT_TAG = "progressDialog";
 
     private void reloadPictureAfterQueryChange() {
+        mPage = 0;
+
         mThumbnailDownloader.clearQueue();
+
         mLastPosition = 0;
+
+        int oldSize = mGalleryItems.size();
         mGalleryItems.clear();
+        mPhotoRecyclerView.getAdapter().notifyItemRangeRemoved(0, oldSize);
 
         showDialog();
 

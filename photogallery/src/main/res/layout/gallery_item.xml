@@ -4,6 +4,7 @@
               android:layout_height="140dp"
               android:layout_width="match_parent"
               android:orientation="vertical"
+              android:layout_margin="8dp"
               xmlns:tools="http://schemas.android.com/tools">
     <TextView
         android:id="@+id/fragment_photo_gallery_text_view"
