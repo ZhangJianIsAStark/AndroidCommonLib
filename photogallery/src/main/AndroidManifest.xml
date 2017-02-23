@@ -36,14 +36,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-
-        <receiver android:name=".receiver.NotificationReceiver"
-            android:exported="false">
-            <intent-filter android:priority="-999">
-                <action android:name="stark.a.is.zhang.photogallery.SHOW_NOTIFICATION"/>
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>

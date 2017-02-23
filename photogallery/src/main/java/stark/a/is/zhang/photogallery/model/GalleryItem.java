@@ -14,7 +14,7 @@ public class GalleryItem {
     }
 
     public String getFromURLHost() {
-        return mFromURLHost;
+        return "http://" + mFromURLHost;
     }
 
     public void setFromURLHost(String fromURL) {

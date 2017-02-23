@@ -1,5 +1,6 @@
 package stark.a.is.zhang.quizgeo;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;

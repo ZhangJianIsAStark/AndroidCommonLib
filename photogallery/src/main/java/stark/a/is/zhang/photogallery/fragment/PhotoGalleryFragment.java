@@ -5,6 +5,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,8 +14,10 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
@@ -58,11 +61,15 @@ public class PhotoGalleryFragment extends VisibleFragment {
 
     private String mLastQuery;
 
+    private Handler mMainHandler;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
+        mMainHandler = new Handler();
 
         mCallback = new LoaderCallback();
         createThumbnailDownLoader();
@@ -340,9 +347,8 @@ public class PhotoGalleryFragment extends VisibleFragment {
                 mPhotoRecyclerView.setAdapter(new PhotoAdapter(mGalleryItems));
             } else {
                 mPhotoRecyclerView.getAdapter().notifyDataSetChanged();
+                mPhotoRecyclerView.scrollToPosition(mLastPosition);
             }
-
-            mPhotoRecyclerView.scrollToPosition(mLastPosition);
 
             if (mGalleryItems.size() == 0) {
                 Toast.makeText(getContext(), "Downloading now", Toast.LENGTH_LONG).show();
@@ -388,9 +394,11 @@ public class PhotoGalleryFragment extends VisibleFragment {
         }
     }
 
-    private class PhotoHolder extends RecyclerView.ViewHolder {
+    private class PhotoHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
         private ImageView mItemImageView;
         private TextView mTextView;
+        private String mUri;
 
         PhotoHolder(View itemView) {
             super(itemView);
@@ -398,11 +406,19 @@ public class PhotoGalleryFragment extends VisibleFragment {
                     (R.id.fragment_photo_gallery_image_view);
             mTextView = (TextView) itemView.findViewById(
                     R.id.fragment_photo_gallery_text_view);
+            itemView.setOnClickListener(this);
         }
 
         void bindDrawable(Drawable drawable, int position) {
             mItemImageView.setImageDrawable(drawable);
             mTextView.setText(getString(R.string.text_title, "" + position));
+            mUri = mGalleryItems.get(position).getFromURLHost();
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(mUri));
+            startActivity(i);
         }
 
 // A Test used Picasso Library to download pictures
@@ -534,7 +550,7 @@ public class PhotoGalleryFragment extends VisibleFragment {
                         JobInfo jobInfo = new JobInfo.Builder(
                                 JOB_ID, new ComponentName(getContext(), JobPollService.class))
                                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
-                                .setPeriodic(1000 * 10 * 15)
+                                .setPeriodic(1000 * 10 * 3)
                                 .setPersisted(true)
                                 .build();
                         scheduler.schedule(jobInfo);

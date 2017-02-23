@@ -1,6 +1,5 @@
 package stark.a.is.zhang.photogallery.service;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -11,12 +10,16 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Random;
 
 import stark.a.is.zhang.photogallery.R;
 import stark.a.is.zhang.photogallery.activity.PhotoGalleryActivity;
+import stark.a.is.zhang.photogallery.model.EventBusData;
 import stark.a.is.zhang.photogallery.tool.QueryPreference;
 
 public class PollService extends IntentService {
@@ -32,9 +35,6 @@ public class PollService extends IntentService {
             "stark.a.is.zhang.photogallery.SHOW_NOTIFICATION";
 
     public static final String PERM_PRIVATE = "stark.a.is.zhang.photogallery.Private";
-
-    public static final String REQUEST_CODE = "REQUEST_CODE";
-    public static final String NOTIFICATION = "NOTIFICATION";
 
     public static Intent newIntent(Context context) {
         return new Intent(context, PollService.class);
@@ -76,7 +76,12 @@ public class PollService extends IntentService {
                 .setAutoCancel(true)
                 .build();
 
-        showBackgroundNotification(0, notification);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(0, notification);
+
+        EventBus eventBus = EventBus.getDefault();
+        eventBus.post(new EventBusData(0));
     }
 
     private boolean isNetworkAvailableAndConnected() {
@@ -109,14 +114,5 @@ public class PollService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
 
         return pi != null;
-    }
-
-    private void showBackgroundNotification(int requestCode, Notification notification) {
-        Intent i = new Intent(ACTION_SHOW_NOTIFICATION);
-        i.putExtra(REQUEST_CODE, requestCode);
-        i.putExtra(NOTIFICATION, notification);
-
-        sendOrderedBroadcast(i, PERM_PRIVATE, null, null,
-                Activity.RESULT_OK,null,null);
     }
 }
