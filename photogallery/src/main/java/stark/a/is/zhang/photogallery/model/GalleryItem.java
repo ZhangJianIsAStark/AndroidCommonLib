@@ -1,5 +1,7 @@
 package stark.a.is.zhang.photogallery.model;
 
+import android.net.Uri;
+
 public class GalleryItem {
     private String mObjURL;
     private String mFromURLHost;
@@ -14,7 +16,7 @@ public class GalleryItem {
     }
 
     public String getFromURLHost() {
-        return "http://" + mFromURLHost;
+        return mFromURLHost;
     }
 
     public void setFromURLHost(String fromURL) {

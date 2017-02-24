@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import stark.a.is.zhang.photogallery.R;
+import stark.a.is.zhang.photogallery.activity.PhotoPageActivity;
 import stark.a.is.zhang.photogallery.model.GalleryItem;
 import stark.a.is.zhang.photogallery.service.JobPollService;
 import stark.a.is.zhang.photogallery.service.PollService;
@@ -77,7 +78,10 @@ public class PhotoGalleryFragment extends VisibleFragment {
         if (isConnectedToNetwork()) {
             startURLLoader(buildLoaderArgs());
         } else {
-            Toast.makeText(getActivity(), "Please Connect to Internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),
+                    "Please Connect to Internet",
+                    Toast.LENGTH_SHORT)
+                    .show();
         }
 
         if (Build.VERSION.SDK_INT >= 21) {
@@ -417,7 +421,11 @@ public class PhotoGalleryFragment extends VisibleFragment {
 
         @Override
         public void onClick(View v) {
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(mUri));
+            if (Uri.parse(mUri).getScheme() == null) {
+                mUri = "http://" + mUri;
+            }
+
+            Intent i = PhotoPageActivity.newIntent(getContext(), Uri.parse(mUri));
             startActivity(i);
         }
 

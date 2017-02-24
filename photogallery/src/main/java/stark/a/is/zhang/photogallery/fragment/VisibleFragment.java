@@ -1,6 +1,5 @@
 package stark.a.is.zhang.photogallery.fragment;
 
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
