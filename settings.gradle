@@ -1,1 +1,1 @@
-include ':activityLib', ':utilsLib', ':quizgeoApp', ':criminalintentapp', ':beatbox', ':nerdlauncher', ':photogallery'
+include ':activityLib', ':utilsLib', ':quizgeoApp', ':criminalintentapp', ':beatbox', ':nerdlauncher', ':photogallery', ':draganddraw'
