@@ -7,9 +7,11 @@
       <module fileurl="file://$PROJECT_DIR$/beatbox/beatbox.iml" filepath="$PROJECT_DIR$/beatbox/beatbox.iml" />
       <module fileurl="file://$PROJECT_DIR$/criminalintentapp/criminalintentapp.iml" filepath="$PROJECT_DIR$/criminalintentapp/criminalintentapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/draganddraw/draganddraw.iml" filepath="$PROJECT_DIR$/draganddraw/draganddraw.iml" />
+      <module fileurl="file://$PROJECT_DIR$/maptest/maptest.iml" filepath="$PROJECT_DIR$/maptest/maptest.iml" />
       <module fileurl="file://$PROJECT_DIR$/nerdlauncher/nerdlauncher.iml" filepath="$PROJECT_DIR$/nerdlauncher/nerdlauncher.iml" />
       <module fileurl="file://$PROJECT_DIR$/photogallery/photogallery.iml" filepath="$PROJECT_DIR$/photogallery/photogallery.iml" />
       <module fileurl="file://$PROJECT_DIR$/quizgeoApp/quizgeoApp.iml" filepath="$PROJECT_DIR$/quizgeoApp/quizgeoApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sunset/sunset.iml" filepath="$PROJECT_DIR$/sunset/sunset.iml" />
       <module fileurl="file://$PROJECT_DIR$/utilsLib/utilsLib.iml" filepath="$PROJECT_DIR$/utilsLib/utilsLib.iml" />
     </modules>
   </component>

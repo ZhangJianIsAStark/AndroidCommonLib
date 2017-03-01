@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MapTest</string>
+    <string name="show_location">show location</string>
+    <string name="clear_location">clear location</string>
+
+    <string name="menu_show_traffic">Show Traffic</string>
+    <string name="menu_hide_traffic">Hide Traffic</string>
+
+    <string name="menu_show_heat">Show Heat</string>
+    <string name="menu_hide_heat">Hide Heat</string>
+</resources>
